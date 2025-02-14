@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tapaiko Horoscope</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --background: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--background);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 1rem 0;
+        }
+
+        .disclaimer {
+            background: rgba(255, 75, 75, 0.1);
+            border-left: 3px solid #ef4444;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #ff9999;
+            line-height: 1.4;
+        }
+
+        .zodiac-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .zodiac-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--primary);
+            padding: 1rem;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .zodiac-btn:active {
+            transform: scale(0.98);
+        }
+
+        .prediction-card {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .prediction-text {
+            line-height: 1.5;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .zodiac-sign {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: #94a3b8;
+        }
+
+        .watermark {
+            position: fixed;
+            bottom: 8px;
+            right: 8px;
+            opacity: 0.3;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">Website by Aayush</div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Tapaiko Horoscope</h1>
+        </header>
+
+        <div class="disclaimer">
+            ⚠️ Disclaimer: Predictions are for entertainment only. 
+            Not professional advice. Accuracy not guaranteed.
+        </div>
+
+        <div class="zodiac-grid" id="zodiacGrid"></div>
+        <div class="loading" id="loading">Consulting the stars...</div>
+        <div class="prediction-card" id="predictionCard"></div>
+    </div>
+
+    <script>
+        const zodiacData = [
+            { name: 'Aries', symbol: '♈' },
+            { name: 'Taurus', symbol: '♉' },
+            { name: 'Gemini', symbol: '♊' },
+            { name: 'Cancer', symbol: '♋' },
+            { name: 'Leo', symbol: '♌' },
+            { name: 'Virgo', symbol: '♍' },
+            { name: 'Libra', symbol: '♎' },
+            { name: 'Scorpio', symbol: '♏' },
+            { name: 'Sagittarius', symbol: '♐' },
+            { name: 'Capricorn', symbol: '♑' },
+            { name: 'Aquarius', symbol: '♒' },
+            { name: 'Pisces', symbol: '♓' }
+        ];
+
+        const predictions = {
+            Aries: ["The stars align for new beginnings. Trust your instincts.", "Unexpected opportunities arise today."],
+            Taurus: ["Your determination leads to success.", "Enjoy life's simple pleasures."],
+            Gemini: ["Communication is key today.", "New connections bring fresh ideas."],
+            Cancer: ["Focus on emotional balance.", "Family matters need attention."],
+            Leo: ["Creativity shines brightly.", "Leadership opportunities await."],
+            Virgo: ["Organization brings success.", "Pay attention to health."],
+            Libra: ["Seek harmony in relationships.", "Important decisions await."],
+            Scorpio: ["Intuition guides you today.", "Deep transformations begin."],
+            Sagittarius: ["Embrace adventure!", "New learning opportunities appear."],
+            Capricorn: ["Focus on career goals.", "Long-term planning pays off."],
+            Aquarius: ["Innovative ideas flow.", "Social connections inspire."],
+            Pisces: ["Express your creativity!", "Trust your compassion."]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('zodiacGrid');
+            zodiacData.forEach(sign => {
+                const btn = document.createElement('button');
+                btn.className = 'zodiac-btn';
+                btn.innerHTML = `
+                    <span class="zodiac-sign">${sign.symbol}</span>
+                    <div>${sign.name}</div>
+                `;
+                btn.addEventListener('click', () => showPrediction(sign.name));
+                grid.appendChild(btn);
+            });
+        });
+
+        async function showPrediction(sign) {
+            const loading = document.getElementById('loading');
+            const card = document.getElementById('predictionCard');
+            
+            loading.style.display = 'block';
+            card.style.opacity = '0';
+            
+            await new Promise(resolve => setTimeout(resolve, 250));
+            
+            const dailySeed = Math.floor(Date.now() / 86400000) % predictions[sign].length;
+            const prediction = predictions[sign][dailySeed];
+            
+            card.innerHTML = `
+                <h3>${sign} Reading</h3>
+                <div class="prediction-text">${prediction}</div>
+            `;
+            
+            loading.style.display = 'none';
+            card.style.opacity = '1';
+        }
+    </script>
+</body>
+</html>
